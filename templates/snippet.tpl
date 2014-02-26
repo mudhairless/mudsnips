@@ -14,6 +14,10 @@
         <h3>License Info</h3>
         <p><a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a></p>
     </div>
+    <div class="pure-u-1-5">
+        <h3>Rating</h3>
+        <p class="without-top-margin">{$rating}<br/><a href="rate/{$snip_id}/like" class="pure-button pure-button-sm button-like">Like</a><a href="rate/{$snip_id}/dislike" class="pure-button pure-button-sm button-dislike">Dislike</a></p>
+    </div>
     {if isset($author)}
     {if $author['id'] == $sauth['id']}
     <div class="pure-u-1-2">

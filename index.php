@@ -54,8 +54,8 @@ $app->get('/search(/:page)', function($page = 1) use ($smarty,$app) {
     }
     $title = array('title LIKE ?','%'.$req.'%');
     $snippets = Snippet::find('all',array('conditions' => $title));
-    $numpages = (int)(count($snippets) / 10);
-    if($numpages != count($snippets) / 10) $numpages++;
+    $numpages = (int)(count($snippets) / RESULTS_PER_PAGE);
+    if($numpages != count($snippets) / RESULTS_PER_PAGE) $numpages++;
     if($numpages < 1) $numpages = 1;
     if($page > $numpages) {
         $app->response->headers->set('Location',BASE_HREF.'/');
@@ -63,14 +63,14 @@ $app->get('/search(/:page)', function($page = 1) use ($smarty,$app) {
         $app->response->setStatus(404);
         return;
     }
-    $curpage_top = $page * 10;
-    $curpage_bottom = $curpage_top - 10;
+    $curpage_top = $page * RESULTS_PER_PAGE;
+    $curpage_bottom = $curpage_top - RESULTS_PER_PAGE;
     unset($snippets);
     try{
-    if($curpage_bottom < 10) {
-        $snippets = Snippet::find('all',array('limit' => 10,'conditions' => $title));
+    if($curpage_bottom < RESULTS_PER_PAGE) {
+        $snippets = Snippet::find('all',array('limit' => RESULTS_PER_PAGE,'conditions' => $title));
     } else {
-        $snippets = Snippet::find('all',array('limit' => 10,'offset' => $curpage_bottom, 'conditions' => $title));
+        $snippets = Snippet::find('all',array('limit' => RESULTS_PER_PAGE,'offset' => $curpage_bottom, 'conditions' => $title));
     }
     } catch (Exception $e) {
         $app->response->headers->set('Location',BASE_HREF.'/');
@@ -132,8 +132,8 @@ $app->get('/snippets/by-lang/:lang(/:page)', function($lang,$page = 1) use ($sma
     if(count($snippets) == 0) {
         $smarty->assign('message','No snippets available.');
     }
-    $numpages = (int)(count($snippets) / 10);
-    if($numpages != count($snippets) / 10) $numpages++;
+    $numpages = (int)(count($snippets) / RESULTS_PER_PAGE);
+    if($numpages != count($snippets) / RESULTS_PER_PAGE) $numpages++;
     if($numpages < 1) $numpages = 1;
     if($page > $numpages) {
         $app->response->headers->set('Location',BASE_HREF.'/');
@@ -141,14 +141,14 @@ $app->get('/snippets/by-lang/:lang(/:page)', function($lang,$page = 1) use ($sma
         $app->response->setStatus(404);
         return;
     }
-    $curpage_top = $page * 10;
-    $curpage_bottom = $curpage_top - 10;
+    $curpage_top = $page * RESULTS_PER_PAGE;
+    $curpage_bottom = $curpage_top - RESULTS_PER_PAGE;
     unset($snippets);
     try{
-    if($curpage_bottom < 10) {
-        $snippets = Snippet::find('all',array('conditions' => array('language = ?',$lang), 'limit' => 10));
+    if($curpage_bottom < RESULTS_PER_PAGE) {
+        $snippets = Snippet::find('all',array('conditions' => array('language = ?',$lang), 'limit' => RESULTS_PER_PAGE));
     } else {
-        $snippets = Snippet::find('all',array('conditions' => array('language = ?',$lang), 'limit' => 10, 'offset' => $curpage_bottom));
+        $snippets = Snippet::find('all',array('conditions' => array('language = ?',$lang), 'limit' => RESULTS_PER_PAGE, 'offset' => $curpage_bottom));
     }
     } catch (Exception $e) {
         $app->response->headers->set('Location',BASE_HREF.'/');
@@ -172,8 +172,8 @@ $app->get('/snippets/by-lang/:lang(/:page)', function($lang,$page = 1) use ($sma
 
 $app->get('/snippets/by-author/:id(/:page)', function($id, $page = 1) use ($smarty,$app) {
     $snippets = Snippet::find('all',array('conditions' => array('author = ?',$id)));
-    $numpages = (int)(count($snippets) / 10);
-    if($numpages != count($snippets) / 10) $numpages++;
+    $numpages = (int)(count($snippets) / RESULTS_PER_PAGE);
+    if($numpages != count($snippets) / RESULTS_PER_PAGE) $numpages++;
     if($numpages < 1) $numpages = 1;
     if($page > $numpages) {
         $app->response->headers->set('Location',BASE_HREF.'/');
@@ -181,14 +181,14 @@ $app->get('/snippets/by-author/:id(/:page)', function($id, $page = 1) use ($smar
         $app->response->setStatus(404);
         return;
     }
-    $curpage_top = $page * 10;
-    $curpage_bottom = $curpage_top - 10;
+    $curpage_top = $page * RESULTS_PER_PAGE;
+    $curpage_bottom = $curpage_top - RESULTS_PER_PAGE;
     unset($snippets);
     try{
-    if($curpage_bottom < 10) {
-        $snippets = Snippet::find('all',array('conditions' => array('author = ?',$id), 'limit' => 10));
+    if($curpage_bottom < RESULTS_PER_PAGE) {
+        $snippets = Snippet::find('all',array('conditions' => array('author = ?',$id), 'limit' => RESULTS_PER_PAGE));
     } else {
-        $snippets = Snippet::find('all',array('conditions' => array('author = ?',$id), 'limit' => 10, 'offset' => $curpage_bottom));
+        $snippets = Snippet::find('all',array('conditions' => array('author = ?',$id), 'limit' => RESULTS_PER_PAGE, 'offset' => $curpage_bottom));
     }
     } catch (Exception $e) {
         $app->response->headers->set('Location',BASE_HREF.'/');
@@ -212,8 +212,8 @@ $app->get('/snippets/by-author/:id(/:page)', function($id, $page = 1) use ($smar
 
 $app->get('/snippets/top(/:page)', function($page = 1) use ($smarty,$app) {
     $snippets = Snippet::find('all',array('order' => 'rating desc'));
-    $numpages = (int)(count($snippets) / 10);
-    if($numpages != count($snippets) / 10) $numpages++;
+    $numpages = (int)(count($snippets) / RESULTS_PER_PAGE);
+    if($numpages != count($snippets) / RESULTS_PER_PAGE) $numpages++;
     if($numpages < 1) $numpages = 1;
     if($page > $numpages) {
         $app->response->headers->set('Location',BASE_HREF.'/');
@@ -221,14 +221,14 @@ $app->get('/snippets/top(/:page)', function($page = 1) use ($smarty,$app) {
         $app->response->setStatus(404);
         return;
     }
-    $curpage_top = $page * 10;
-    $curpage_bottom = $curpage_top - 10;
+    $curpage_top = $page * RESULTS_PER_PAGE;
+    $curpage_bottom = $curpage_top - RESULTS_PER_PAGE;
     unset($snippets);
     try{
-    if($curpage_bottom < 10) {
-        $snippets = Snippet::find('all',array('order' => 'rating desc', 'limit' => 10));
+    if($curpage_bottom < RESULTS_PER_PAGE) {
+        $snippets = Snippet::find('all',array('order' => 'rating desc', 'limit' => RESULTS_PER_PAGE));
     } else {
-        $snippets = Snippet::find('all',array('order' => 'rating desc', 'limit' => 10, 'offset' => $curpage_bottom));
+        $snippets = Snippet::find('all',array('order' => 'rating desc', 'limit' => RESULTS_PER_PAGE, 'offset' => $curpage_bottom));
     }
     } catch (Exception $e) {
         $app->response->headers->set('Location',BASE_HREF.'/');
@@ -251,8 +251,8 @@ $app->get('/snippets/top(/:page)', function($page = 1) use ($smarty,$app) {
 
 $app->get('/snippets/recent(/:page)', function($page = 1) use ($app,$smarty) {
     $snippets = Snippet::find('all',array('order' => 'created_at desc'));
-    $numpages = (int)(count($snippets) / 10);
-    if($numpages != count($snippets) / 10) $numpages++;
+    $numpages = (int)(count($snippets) / RESULTS_PER_PAGE);
+    if($numpages != count($snippets) / RESULTS_PER_PAGE) $numpages++;
     if($numpages < 1) $numpages = 1;
     if($page > $numpages) {
         $app->response->headers->set('Location',BASE_HREF.'/');
@@ -260,14 +260,14 @@ $app->get('/snippets/recent(/:page)', function($page = 1) use ($app,$smarty) {
         $app->response->setStatus(404);
         return;
     }
-    $curpage_top = $page * 10;
-    $curpage_bottom = $curpage_top - 10;
+    $curpage_top = $page * RESULTS_PER_PAGE;
+    $curpage_bottom = $curpage_top - RESULTS_PER_PAGE;
     unset($snippets);
     try{
-    if($curpage_bottom < 10) {
-        $snippets = Snippet::find('all',array('order' => 'created_at desc', 'limit' => 10));
+    if($curpage_bottom < RESULTS_PER_PAGE) {
+        $snippets = Snippet::find('all',array('order' => 'created_at desc', 'limit' => RESULTS_PER_PAGE));
     } else {
-        $snippets = Snippet::find('all',array('order' => 'created_at desc', 'limit' => 10, 'offset' => $curpage_bottom));
+        $snippets = Snippet::find('all',array('order' => 'created_at desc', 'limit' => RESULTS_PER_PAGE, 'offset' => $curpage_bottom));
     }
     } catch (Exception $e) {
         $app->response->headers->set('Location',BASE_HREF.'/');
@@ -344,6 +344,26 @@ $app->get('/snippet/:id(/:action)', function($id,$action = null) use ($languages
         }
         $smarty->assign('code',$codef);
     }
+    switch($snip->rating) {
+        case 0:
+            $rating = 'Unrated';
+            break;
+        case ($snip->rating < 10):
+            $rating = 'Hated';
+            break;
+        case ($snip->rating < 50):
+            $rating = 'Disliked';
+            break;
+        case ($snip->rating == 50):
+            $rating = 'Divisive';
+            break;
+        case ($snip->rating > 90):
+            $rating = 'Loved';
+            break;
+        default:
+            $rating = 'Liked';
+    }
+    $smarty->assign('rating',$rating);
     $smarty->assign('snip_id',$id);
     $pauth = Author::find($snip->author);
     $sauth = array( 'id' => $pauth->id, 'name' => $pauth->name, 'gravatar' => get_gravatar($pauth->email) );
@@ -364,7 +384,7 @@ $app->post('/snippet', function() use ($app,$smarty) {
     $snippet->title = htmlspecialchars($app->request->post('title'));
     $snippet->code = htmlspecialchars($app->request->post('code'));
     $snippet->language = $app->request->post('language');
-    $snippet->rating = 50;
+    $snippet->rating = 0;
     if($snippet->save()) {
         $app->response->headers->set('Location',BASE_HREF.'/snippet/'.$snippet->id);
         return;
@@ -452,6 +472,7 @@ $app->post('/authors/login', function() use ($app) {
     $redir = $app->getCookie('redir');
     if($redir == '') $redir = '/';
     $app->response->headers->set('Location',BASE_HREF.$redir);
+    $app->deleteCookie('redir');
     $app->setCookie('user_login',$user[0]->id,'7 days');
 });
 
@@ -571,6 +592,88 @@ $app->put('/author/:id', function($id) use ($app,$smarty) {
     }
     $app->response->headers->set('Location',BASE_HREF.'/author/'.$id);
 
+});
+
+$app->get('/rate/:id/:func', function($id,$func) use ($app) {
+    try {
+        $user = Author::find($app->getCookie('user_login'));
+        $snip = Snippet::find($id);
+    } catch (Exception $e) {
+        $app->response->headers->set('Location',BASE_HREF.'/authors/login');
+        $app->setCookie('message','You must log in before performing that action.');
+        $app->setCookie('redir','/snippet/'.$id);
+        $app->response->setStatus(403);
+        return;
+    }
+    switch($func) {
+        case 'like':
+            $action = true;
+            break;
+        case 'dislike':
+            $action = false;
+            break;
+        default:
+            $app->response->headers->set('Location',BASE_HREF.'/snippet/'.$id);
+            $app->setCookie('message','Incorrect verb for rating, are you making stuff up?');
+            $app->response->setStatus(403);
+            return;
+    }
+    $votes = unserialize($user->votes);
+    if(is_array($votes)) {
+        //check votes
+        if(isset($votes[(string)$id])){
+            if($votes[(string)$id] == $action) {
+                $app->response->headers->set('Location',BASE_HREF.'/snippet/'.$id);
+                $app->setCookie('message','You have already voted for this snippet.');
+                return;
+            }
+        }
+    } else {
+        $votes = array();
+    }
+    $votes[(string)$id] = $action;
+    $user->votes = serialize($votes);
+    $user->save();
+
+    $cur_rate = $snip->rating;
+    if($cur_rate == 0) {
+        if($action){
+            $cur_rate = 100;
+        } else {
+            $cur_rate = 1;
+        }
+    } else {
+        if($action){
+            if(!isset($votes[(string)$id])){
+                $cur_rate = ($cur_rate + 100) / 2;
+            } else {
+                $cur_rate = ($cur_rate + 200) / 2;
+            }
+        } else {
+            if(!isset($votes[(string)$id])){
+                $cur_rate = ($cur_rate / 2);
+            } else {
+                $cur_rate = ($cur_rate - 100) / 2;
+            }
+        }
+    }
+    if($cur_rate < 1) {
+        if(isset($votes[(string)$id])){
+            $cur_rate = 0;
+        } else {
+            $cur_rate = 1;
+        }
+    }
+    if($cur_rate > 100) $cur_rate = 100;
+    if(isset($votes[(string)$id]) && !$action){
+        unset($votes[(string)$id]);
+        $user->votes = serialize($votes);
+        $user->save();
+    }
+    $snip->rating = $cur_rate;
+    $snip->save();
+    $app->response->headers->set('Location',BASE_HREF.'/snippet/'.$id);
+    $app->setCookie('message','Vote Recorded.');
 });
 
 $app->get('/lang/:id', function($id) {

@@ -8,7 +8,7 @@
 <div class="pure-u-1-2">
 <!-- right col -->
 <h3>About MudSnips the software</h3>
-<p>MudSnips is open source snippet sharing software licensed under the GNU GPLv3. MudSnips aims to be lightweight and very fast.</p>
+<p>MudSnips is open source code snippet sharing software licensed under the GNU GPLv3. MudSnips aims to be lightweight and very fast.</p>
 <p>You can get your very own copy or just look at the source on <a href="https://github.com/mudhairless/mudsnips">GitHub</a>.</p>
 </div>
 </div>

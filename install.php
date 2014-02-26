@@ -34,6 +34,7 @@ $app->post('/',function() use($app) {
     fwrite($fh,"define('SITE_OWNER','$rso');"."\n");
     fwrite($fh,"define('SITE_CONTACT','$rsc');"."\n");
     fwrite($fh,"define('ALLOW_REGISTRATION',true);\n");
+    fwrite($fh,"define('RESULTS_PER_PAGE',10);\n");
     fwrite($fh,'ActiveRecord\Config::initialize(function($cfg){$cfg->set_model_directory("'.$rdmd.'");$cfg->set_connections(array("development" => "'.$rdb.'"));});'."\n");
     fwrite($fh,'$slimconfig = array("cookies.encrypt" => true, "cookies.secret_key" => "'.$rsk.'");'."\n");
     fwrite($fh,'$app = new Slim\Slim($slimconfig);'."\n");
