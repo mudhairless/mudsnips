@@ -1,0 +1,7 @@
+config.php
+configs/*
+*.sqlite
+templates_c/*
+*.lock
+cache/*
+vendor/*

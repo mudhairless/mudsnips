@@ -1,0 +1,17 @@
+{
+    "name": "mud/snippets",
+    "description": "snippets of code",
+    "require": {
+        "php-activerecord/php-activerecord": "1.*",
+	"slim/slim": "2.*",
+	"smarty/smarty": "3.1.*",
+	"gregwar/captcha": "dev-master",
+	"easybook/geshi": "dev-master"
+    },
+    "authors": [
+        {
+            "name": "Ebben Feagan",
+            "email": "ebben.feagan@gmail.com"
+        }
+    ]
+}
