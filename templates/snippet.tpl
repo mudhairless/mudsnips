@@ -1,16 +1,17 @@
 {include file="header.tpl"}
-<h2>{$ctitle} in <a href="snippets/by-lang/{$lang->name}">{$lang->name}</a></h2>
 {if !isset($action)}
 <div class="pure-g">
+    <div class="pure-u-1-5">
+        <h3>Written by</h3>
+        <p class="without-top-margin"><a href="snippets/by-author/{$sauth['id']}">{$sauth['name']}</a>
+        <br/>View As: <a href="snippet/{$snip_id}/raw">Plain Text</a></p>
+    </div>
     <div class="pure-u-1-5">
         <h3></h3>
         <img src="{$sauth['gravatar']}" />
     </div>
     <div class="pure-u-1-5">
-        <h3>Written by</h3>
-        <p><a href="snippets/by-author/{$sauth['id']}">{$sauth['name']}</a></p>
-    </div>
-    <div class="pure-u-1-5">
+        <h3>License Info</h3>
         <p><a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a></p>
     </div>
     {if isset($author)}
@@ -22,6 +23,10 @@
     </div>
     {/if}
     {/if}
+    <div class="pure-u-1-5">
+        <h3>Related</h3>
+        <p><a href="snippets/by-lang/{$lang->name}">More in {$lang->name|capitalize}</a></p>
+    </div>
 </div>
 <div class="snippet">
 {$code}
@@ -35,7 +40,7 @@
     <option value="{$l@index+1}"{if $l == $lang->name} selected="selected"{/if}>{$l|capitalize}</option>
     {/foreach}
 </select>
-<label for="code">Code</label><textarea cols="80" rows="15">{$raw_code}</textarea>
+<label for="code">Code</label><textarea id="code_editor" cols="80" rows="15">{$raw_code}</textarea>
 <input type="submit" value="Submit Changes" />
 </form>
 {/if}

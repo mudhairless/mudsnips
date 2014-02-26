@@ -42,7 +42,6 @@ $app->post('/',function() use($app) {
     fwrite($fh,'$geshi->set_header_type(GESHI_HEADER_PRE_VALID);'."\n");
     fwrite($fh,'$geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);'."\n");
     fwrite($fh,'require("langlist.php");'."\n\n");
-    fwrite($fh,'?>'."\n");
     fflush($fh);
     fclose($fh);
 
@@ -50,4 +49,3 @@ $app->post('/',function() use($app) {
 });
 
 $app->run();
-?>

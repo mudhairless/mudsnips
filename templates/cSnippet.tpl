@@ -7,7 +7,7 @@
         <option value="{$l@index+1}"{if $l == 'freebasic'} selected="selected"{/if}>{$l|capitalize}</option>
         {/foreach}
     </select>
-    <label for="code">Code</label><textarea cols="80" rows="15" name="code"></textarea>
+    <label for="code">Code</label><textarea id="code_editor" cols="80" rows="15" name="code"></textarea>
     <input type="hidden" name="user-id" value="{$author['id']}" />
     <input type="submit" value="Create Snippet" />
 </form>

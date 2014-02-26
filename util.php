@@ -100,4 +100,3 @@ function get_gravatar( $email, $s = 80, $d = 'mm', $r = 'g', $img = false, $atts
     }
     return $url;
 }
-?>

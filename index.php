@@ -28,7 +28,7 @@ check_logged_in($smarty);
 
 $app->get('/', function() use ($smarty,$app) {
     //index
-    $smarty->assign('title','Code Snippets');
+    $smarty->assign('title','Home');
     $smarty->display('index.tpl');
 });
 
@@ -311,9 +311,8 @@ $app->get('/snippet/:id(/:action)', function($id,$action = null) use ($languages
         return;
     }
     $smarty->assign('languages',$languages_list);
-    $smarty->assign('title',$snip->title);
-    $smarty->assign('ctitle',$snip->title);
     $lang = Language::find($snip->language);
+    $smarty->assign('title','"'.$snip->title.'"' . ' in '. ucfirst($lang->name));
     $smarty->assign('lang',$lang);
     $geshi->set_language($lang->name);
     $geshi->set_source(htmlspecialchars_decode($snip->code));
@@ -325,9 +324,16 @@ $app->get('/snippet/:id(/:action)', function($id,$action = null) use ($languages
             $smarty->assign('action',true);
             $smarty->assign('raw_code',$snip->code);
         } else {
-            $app->response->headers->set('Location',BASE_HREF.'/snippet/'.$id);
-            $app->response->setStatus(404);
-            $app->setCookie('message','Not Authorized, are you logged in?');
+            if($action == 'raw') {
+                //raw output
+                $app->response->headers->set('Content-Type','text/plain');
+                echo $snip->code;
+                return;
+            } else {
+                $app->response->headers->set('Location',BASE_HREF.'/snippet/'.$id);
+                $app->response->setStatus(404);
+                $app->setCookie('message','Not Authorized, are you logged in?');
+            }
         }
     } else {
         //no need to parse the code if we're gonna edit
@@ -577,4 +583,3 @@ $app->put('/lang/:id', function($id) {
 });
 
 $app->run();
-?>

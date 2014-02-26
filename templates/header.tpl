@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.4.2/pure-min.css">
 <link rel="stylesheet" href="style.css" />
 <script src="//ajax.googleapis.com/ajax/libs/mootools/1.4.5/mootools-yui-compressed.js"></script>
+<script type="text/javascript" src="Form.PasswordStrength.js"></script>
 <script>
 var ii = 0;
 function refreshCaptcha() {
@@ -18,9 +19,18 @@ function refreshCaptcha() {
 
 window.onload = function (window, document) {
 
+    //var pf = new Form.PasswordStrength('password');
+
     var layout   = $('layout');
     var menu     = $('menu');
     var menuLink = $('menuLink');
+
+    $('code_editor').addEvent('keydown', function (e) {
+        if(e.key === "tab") {
+            this.set('value',this.get('value')+'    ');
+            return false;
+        }
+    });
 
     $('changes').addEvent('click', function (e) {
         var i = confirm("Are you sure you want to delete this snippet?\nThis action cannot be undone.");

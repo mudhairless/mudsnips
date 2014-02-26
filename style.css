@@ -251,11 +251,6 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     margin-right: auto;
 }
 
-#footer {
-    margin-top: 50px;
-    text-align: center;
-}
-
 #error {
     margin-left: auto;
     margin-right: auto;
@@ -309,7 +304,6 @@ Hides the menu at `48em`, but modify this based on your app's needs.
 
 .legal {
     line-height: 1.6;
-    text-align: center;
     margin: 0 auto;
 }
 
@@ -317,11 +311,26 @@ Hides the menu at `48em`, but modify this based on your app's needs.
         margin-top: 0;
     }
     .legal-links {
+        text-align: right;
         list-style: none;
         padding: 0;
         margin-bottom: 0;
+        margin: 0;
     }
     .legal-copyright {
+        text-align: right;
         margin-top: 0;
         margin-bottom: 0;
     }
+
+.pure-u-1-5 h3 {
+    margin-bottom: 0px;
+}
+
+.pure-u-sm-1-2 {
+    width: 50%;
+}
+
+.without-top-margin {
+    margin-top: 0px;
+}
