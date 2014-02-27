@@ -856,4 +856,10 @@ $app->post('/authors/reset(/:id)', function($id = null) use ($app) {
     }
 });
 
+$app->notFound(function() use ($app,$smarty) {
+    $smarty->assign('title','Page Not Found (404)');
+    $smarty->assign('requested',trim(str_replace('/',' ',$app->environment['PATH_INFO'])));
+    $smarty->display('404.tpl');
+});
+
 $app->run();

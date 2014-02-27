@@ -1,5 +1,8 @@
 {include file="header.tpl"}
 
+{if count($snippets) == 0}
+<em>No Results Found</em>
+{/if}
 {if !isset($message)}
 <ul class="pagecounter" style="counter-reset: section {$start_index};">
 {foreach $snippets as $snippet}
@@ -8,7 +11,7 @@
 </ul>
 {/if}
 
-{if isset($curpage)}
+{if isset($curpage) && count($snippets) > 0}
 <ul class="pure-paginator">
     {if $curpage == 1}
         <li><a class="pure-button pure-button-disabled" href="{$url_prefix}{$curpage}">&#171;</a></li>
