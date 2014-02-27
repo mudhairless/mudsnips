@@ -3,7 +3,7 @@
 <div class="pure-g">
     <div class="pure-u-1-5">
         <h3>Written by</h3>
-        <p class="without-top-margin"><a href="snippets/by-author/{$sauth['id']}">{$sauth['name']}</a>
+        <p class="without-top-margin"><a href="author/{$sauth['id']}">{$sauth['name']}</a>
         <br/>View As: <a href="snippet/{$snip_id}/raw">Plain Text</a></p>
     </div>
     <div class="pure-u-1-5">

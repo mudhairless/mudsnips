@@ -347,6 +347,15 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     background: #A52A2A;
 }
 
+.pure-button-red {
+    background: #F00;
+}
+
+.admin-actions {
+    background-color: #FFC0CB;
+    padding: 5px;
+}
+
 .without-top-margin {
     margin-top: 0px;
 }

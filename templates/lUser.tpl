@@ -1,13 +1,11 @@
 {include file="header.tpl"}
 <div id='signup'>
 {if !isset($author)}
-
-<h1>Author Profile</h1>
 <img src="{$gravatar}" /><br/>
 Name: {$user->name}<br/>
 Website: {$user->url}<br/>
-About: {$user->about}
-
+About: {$user->about}<br/>
+<a href="snippets/by-author/{$user->id}">All Snippets</a>
 {else}
 
 {if $author['id'] == $user->id}
@@ -30,21 +28,30 @@ About: {$user->about}
     <label for="new-password">New Password</label><input type="password" name="new-password" />
     <label for="captcha">Human Verification</label><img id="captcha" src="captcha" /><input type="text" name="captcha" />
     <input type="hidden" name="_METHOD" value="PUT"/>
-    <input type="button" value="I can't read that" onClick="refreshCaptcha();"/>
+    <input type="button" class="pure-button" value="I can't read that" onClick="refreshCaptcha();"/>
     <input type="submit" class="pure-button pure-button-primary" value="Change Password" />
 </form>
 
 
 {else}
-
-<h1>Author Profile</h1>
 <img src="{$gravatar}" /><br/>
 Name: {$user->name}<br/>
 Website: {$user->url}<br/>
-About: {$user->about}
+About: {$user->about}<br/>
+<a href="snippets/by-author/{$user->id}">All Snippets</a>
 
+{if $author['id'] == 1}
+<div class="admin-actions">
+<h3>Administrator Actions</h3>
+<p>Warning! Deleting this account will also permanently remove all
+snippets associated with it as well.</p>
+<form class="pure-form" method="post" action="author/{$user->id}">
+<input type="hidden" name="_METHOD" value="DELETE"/>
+<input class="pure-button pure-button-red" type="submit" value="DELETE"/>
+</form>
+</div>
 {/if}
-
+{/if}
 {/if}
 </div>
 {include file="footer.tpl"}

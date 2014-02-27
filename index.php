@@ -489,6 +489,38 @@ $app->get('/authors/new', function() use ($smarty,$app) {
     }
 });
 
+$app->delete('/author/:id', function($id) use ($app) {
+    $user = Author::find($app->getCookie('user_login'));
+    $duser = Author::find($id);
+    if($user->id != 1) {
+        $app->response->headers->set('Location',BASE_HREF.'/author/'.$id);
+        $app->setCookie('message','Only an administrator can do that.');
+        $app->response->setStatus(403);
+        return;
+    }
+    if( $id == 1) {
+        $app->response->headers->set('Location',BASE_HREF.'/author/1');
+        $app->setCookie('message','You cannot delete the administrator account.');
+        $app->response->setStatus(403);
+        return;
+    }
+    $duser->delete();
+    $msg = 'Deleted user '.$duser->name;
+    try {
+        $snips = Snippet::find('all',array('conditions' => array('author = ?',$id)));
+    } catch (Exception $e) {
+        $msg = $msg . ', no snippets to delete.';
+    }
+    if(count($snips) > 0) {
+        $msg = $msg . ', also deleted ' . count($snips) . ' snippets as well.';
+        foreach($snips as $snip) {
+            $snip->delete();
+        }
+    }
+    $app->response->headers->set('Location',BASE_HREF.'/');
+    $app->setCookie('message',$msg);
+});
+
 $app->get('/author/:id', function($id) use ($app,$smarty) {
     //get author page
     check_logged_in($smarty);
@@ -568,10 +600,10 @@ $app->put('/author/:id', function($id) use ($app,$smarty) {
             $app->setCookie('message','Captcha does not match.');
             return;
         }
-        $cpass = pbkdf2('',$app->request->put('old-password'),$author->salt);
+        $cpass = pbkdf2('',$app->request->put('old-password'),$author->salt,1024,512);
         if($cpass == $author->password) {
             $newsalt = gen_salt();
-            $author->password = pbkdf2('',$app->request->put('new-password'),$newsalt);
+            $author->password = pbkdf2('',$app->request->put('new-password'),$newsalt,1024,512);
             $author->salt = $newsalt;
             if($email != $author->email)
                 $author->email = $email;
