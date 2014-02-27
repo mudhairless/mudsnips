@@ -1,7 +1,3 @@
-config.php
-configs/*
-*.sqlite
-templates_c/*
 *.lock
-cache/*
+data/*
 vendor/*

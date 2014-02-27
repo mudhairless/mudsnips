@@ -100,3 +100,20 @@ function get_gravatar( $email, $s = 80, $d = 'mm', $r = 'g', $img = false, $atts
     }
     return $url;
 }
+
+function check_logged_in($smarty) {
+    $app = Slim\Slim::getInstance();
+    $message = $app->getCookie('message');
+    if($message != '') {
+        $smarty->assign('message',$message);
+        $app->deleteCookie('message');
+    }
+    $logged_in = $app->getCookie('user_login');
+    if($logged_in != '') {
+        $author_full = Author::find($logged_in);
+        $author = array('id' => $author_full->id,'email' => $author_full->email, 'name' => $author_full->name, 'gravatar' => get_gravatar($author_full->email));
+        $smarty->assign('author',$author);
+        return true;
+    }
+    return false;
+}

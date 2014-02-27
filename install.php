@@ -2,7 +2,7 @@
 require('vendor/autoload.php');
 require('util.php');
 
-if(file_exists('config.php')) {
+if(file_exists('data/config.php')) {
     header('Location: index.php');
     die();
 }
@@ -27,7 +27,7 @@ $app->post('/',function() use($app) {
     $rbh = $app->request->post('base_href');
     $rsk = gen_salt() . gen_salt();
 
-    $fh = fopen('config.php','w') or die("can't open config.php $php_errormsg");
+    $fh = fopen('data/config.php','w') or die("can't open config.php $php_errormsg");
     fwrite($fh,'<?php'."\n");
     fwrite($fh,"define('BASE_HREF','$rbh');"."\n");
     fwrite($fh,"define('SITE_NAME','$rsn');"."\n");
@@ -39,6 +39,10 @@ $app->post('/',function() use($app) {
     fwrite($fh,'$slimconfig = array("cookies.encrypt" => true, "cookies.secret_key" => "'.$rsk.'");'."\n");
     fwrite($fh,'$app = new Slim\Slim($slimconfig);'."\n");
     fwrite($fh,'$smarty = new Smarty();'."\n");
+    fwrite($fh,"$smarty->setTemplateDir('views/');\n".
+                "$smarty->setCompileDir('data/smarty/templates_c/');\n".
+                "$smarty->setConfigDir('data/smarty/configs/');\n".
+                "$smarty->setCacheDir('data/smarty/cache/');\n");
     fwrite($fh,'$geshi = new GeSHi("","php");'."\n");
     fwrite($fh,'$geshi->set_header_type(GESHI_HEADER_PRE_VALID);'."\n");
     fwrite($fh,'$geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);'."\n");
