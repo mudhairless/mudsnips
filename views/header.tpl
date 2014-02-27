@@ -6,9 +6,9 @@
 <title>{$title} | {$site_name}</title>
 <base href="/~mud/snippets/" />
 <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.4.2/pure-min.css">
-<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="assets/styles/style.css" />
 <script src="//ajax.googleapis.com/ajax/libs/mootools/1.4.5/mootools-yui-compressed.js"></script>
-<script type="text/javascript" src="Form.PasswordStrength.js"></script>
+<script type="text/javascript" src="assets/scripts/Form.PasswordStrength.js"></script>
 <script>
 var ii = 0;
 function refreshCaptcha() {
