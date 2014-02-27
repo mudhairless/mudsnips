@@ -2,7 +2,7 @@
 {if $step == 1}
 <form class="pure-form pure-form-aligned" method="post" action="authors/reset">
     <div class="pure-control-group"><label for="email">Email </label><input type="email" name="email" /></div>
-    <div class="pure-control-group"><label for="captcha">Human Verification</label><img src="captcha" /></div>
+    <div class="pure-control-group"><label for="captcha">Human Verification</label><img id="captcha" src="captcha" /></div>
     <div class="pure-control-group"><label></label><input type="text" name="captcha" /></div>
     <div class="pure-controls"><input type="button" class="pure-button" value="I can't read that" onClick="refreshCaptcha();"/><input type="submit" class="pure-button pure-button-primary" value="Reset" /></div>
 </form>
