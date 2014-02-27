@@ -9,7 +9,7 @@
     </select>
     <label for="code">Code</label><textarea id="code_editor" cols="80" rows="15" name="code"></textarea>
     <input type="hidden" name="user-id" value="{$author['id']}" />
-    <input type="submit" value="Create Snippet" />
+    <input type="submit" class="pure-button pure-button-primary" value="Create Snippet" />
 </form>
 
 {include file="footer.tpl"}

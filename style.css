@@ -236,7 +236,7 @@ Hides the menu at `48em`, but modify this based on your app's needs.
         left: 150px;
     }
 }
-
+/*
 #signup form {
     margin-left: auto;
     margin-right: auto;
@@ -249,7 +249,7 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     width: 350px;
     margin-left: auto;
     margin-right: auto;
-}
+}*/
 
 #error {
     margin-left: auto;

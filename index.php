@@ -685,4 +685,140 @@ $app->put('/lang/:id', function($id) {
     //update language
 });
 
+$app->get('/authors/reset(/:code)', function($code = null) use ($app,$smarty) {
+    if($code == null){
+        $smarty->assign('title','Reset Account Password');
+        $smarty->assign('step',1);
+        $smarty->display('pass_reset.tpl');
+    } else {
+        if($code == 'step2') {
+            //show reset code form
+            $smarty->assign('tid',$app->getCookie('tid'));
+            $smarty->assign('title','Enter Reset Code');
+            $smarty->assign('step',2);
+            $smarty->assign('uid',$app->getCookie('uid'));
+            $smarty->display('pass_reset.tpl');
+        } else {
+            //show pass reset form
+            $app->setCookie('rcode',$code);
+            $uid = $app->getCookie('uid');
+            try {
+                $uidb = Password_reset::find('all',array('conditions' => array('code = ?', $code)));
+            } catch (Exception $e) {
+                if($uid == '') {
+                    $app->response->headers->set('Location',BASE_HREF.'/');
+                    $app->setCookie('message','Invalid token.');
+                } else {
+                    $uidb = array( new stdClass( ) );
+                    $uidb->author = $uid;
+                }
+            }
+            if($uid != '' && $uidb[0]->author == $uid) {
+                $smarty->assign('uid',$uid);
+            } else {
+                $smarty->assign('uid',$uidb[0]->author);
+            }
+            $smarty->assign('title','Enter New Password');
+            $smarty->assign('step',3);
+            $smarty->display('pass_reset.tpl');
+        }
+    }
+});
+
+$app->post('/authors/reset(/:id)', function($id = null) use ($app) {
+    if($id != null) {
+        $user = Author::find($id);
+        if($app->request->post('code') != '') {
+            //from step2
+            $app->response->headers->set('Location',BASE_HREF.'/authors/reset/'.$app->request->post('code'));
+            return;
+        } else {
+            //from step3
+            $code = $app->getCookie('rcode');
+            try {
+                $rcode = Password_reset::find('all', array('conditions' => array('author = ?',$id)));
+            } catch (Exception $e) {
+                $app->response->headers->set('Location',BASE_HREF.'/');
+                $app->setCookie('message','Nothing to do.');
+                return;
+            }
+            if($code != $rcode[0]->code) {
+                $app->response->headers->set('Location',BASE_HREF.'/');
+                $app->setCookie('message','Reset codes do not match.');
+                return;
+            }
+            $cdate = new DateTime($rcode[0]->created_at);
+            $now = new DateTime(null);
+            $ddiff = $now->diff($cdate);
+            if($ddiff->i > 15 && $ddiff->invert == 1) {
+                //reset codes
+                $app->response->headers->set('Location',BASE_HREF.'/authors/login');
+                $app->setCookie('message','Code has expired, please try again.');
+                foreach($rcode as $rr) {
+                    $rr->delete();
+                }
+                return;
+            }
+            $newsalt = gen_salt();
+            $user->password = pbkdf2('',$app->request->post('pass'),$newsalt,1024,512);
+            $user->salt = $newsalt;
+            $user->save();
+            $app->response->headers->set('Location',BASE_HREF.'/authors/login');
+            $app->setCookie('message','Your password has been reset.');
+            foreach($rcode as $rr) {
+                $rr->delete();
+            }
+            return;
+        }
+    } else {
+        try {
+            $user = Author::find('all',array('conditions' => array('email = ?',$app->request->post('email'))));
+        } catch (Exception $e) {
+            $app->response->headers->set('Location',BASE_HREF.'/authors/login');
+            $app->setCookie('message','Could not locate account, is it spelled correctly?');
+            $app->response->setStatus(401);
+            return;
+        }
+        $cookie = $app->getCookie('create_user_form');
+        if($cookie == null || $cookie != $app->request->post('captcha')){
+            $app->response->headers->set('Location',BASE_HREF.'/authors/reset');
+            $app->setCookie('message','Captcha does not match.');
+            return;
+        }
+        try {
+            $check = Password_reset::find('all',array('conditions' => array('email = ?',$app->request->post('email'))));
+            foreach($check as $cc) {
+                $cc->delete();
+            }
+        } catch (Exception $e) {
+            //ignore
+        }
+        $rc = new Password_reset();
+        $rc->code = hash('sha256',rand_string(512));
+        $rc->author = $user[0]->id;
+        $rc->save();
+        $app->setCookie('tid',$rc->created_at);
+
+        $body = 'Hello '.$user[0]->name.",\n" .
+                "Someone has requested a password reset\n" .
+                "for ".SITE_NAME.".\n" .
+                "If this was not you you can ignore this message.\n" .
+                "If this was you use this link to reset password:\n" .
+                '<a href="'.BASE_HREF.'/authors/reset/'.$rc->code.'">'.BASE_HREF.'/authors/reset/'.$rc->code.'</a>'."\n".
+                'or enter this code: '. $rc->code . ' in the form.'."\n".
+                '- admin'."\n".
+                '(This code will self destruct in 15 minutes.)';
+        $headers = 'From: '. SITE_CONTACT."\r\n".'X-Mailer: php';
+        if(!mail($user[0]->email,SITE_NAME." Password Reset",$body,$headers)){
+            $app->response->headers->set('Location',BASE_HREF.'/');
+            $app->setCookie('message','There was an issue sending the reset email, please try again later.');
+            $app->response->setStatus(500);
+            return;
+        }
+        $app->response->headers->set('Location',BASE_HREF.'/authors/reset/step2');
+        $app->setCookie('message','Please check your email.');
+        $app->setCookie('uid',$user[0]->id);
+    }
+});
+
 $app->run();

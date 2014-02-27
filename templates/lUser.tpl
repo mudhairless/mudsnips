@@ -18,7 +18,7 @@ About: {$user->about}
     <label for="url">Homepage</label><input name="url" type="url" value="{$user->url}" />
     <label for="about-me">About Me</label><textarea cols="40" rows="10" name="about-me">{$user->about}</textarea>
     <input type="hidden" name="_METHOD" value="PUT"/>
-    <input type="submit" value="Update Account" /><br />
+    <input type="submit" class="pure-button pure-button-primary" value="Update Account" /><br />
 </form>
 
 <hr />
@@ -31,7 +31,7 @@ About: {$user->about}
     <label for="captcha">Human Verification</label><img id="captcha" src="captcha" /><input type="text" name="captcha" />
     <input type="hidden" name="_METHOD" value="PUT"/>
     <input type="button" value="I can't read that" onClick="refreshCaptcha();"/>
-    <input type="submit" value="Change Password" />
+    <input type="submit" class="pure-button pure-button-primary" value="Change Password" />
 </form>
 
 
