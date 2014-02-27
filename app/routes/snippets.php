@@ -1,5 +1,68 @@
 <?php
 
+function ratingToString($val) {
+    switch($val) {
+        case 0:
+            $rating = 'Unrated';
+            break;
+        case ($val < 10):
+            $rating = 'Hated';
+            break;
+        case ($val < 50):
+            $rating = 'Disliked';
+            break;
+        case ($val == 50):
+            $rating = 'Divisive';
+            break;
+        case ($val > 90):
+            $rating = 'Loved';
+            break;
+        default:
+            $rating = 'Liked';
+    }
+    return $rating;
+}
+
+function snippetList( $snippets, $page, $smarty, $app, $func) {
+    if(count($snippets) == 0) {
+        $smarty->assign('message','No snippets available.');
+    }
+    $numpages = (int)(count($snippets) / RESULTS_PER_PAGE);
+    if($numpages != count($snippets) / RESULTS_PER_PAGE) $numpages++;
+    if($numpages < 1) $numpages = 1;
+    if($page > $numpages) {
+        $app->response->headers->set('Location',BASE_HREF.'/');
+        $app->setCookie('message','$page > $numpages'.'<br/>'.$page.'::'.$numpages);
+        $app->response->setStatus(404);
+        return;
+    }
+    $curpage_top = $page * RESULTS_PER_PAGE;
+    $curpage_bottom = $curpage_top - RESULTS_PER_PAGE;
+    unset($snippets);
+
+    try{
+        if($curpage_bottom < RESULTS_PER_PAGE) {
+            $snippets = $func(null);
+        } else {
+            $snippets = $func($curpage_bottom);
+        }
+    } catch (Exception $e) {
+        $app->response->headers->set('Location',BASE_HREF.'/');
+        $app->setCookie('message','5 '.$e->getMessage());
+        $app->response->setStatus(404);
+        return;
+    }
+
+    $pages = array();
+    for($n = 1; $n <= $numpages; $n++)
+        $pages[] = $n;
+    $smarty->assign('start_index',$curpage_bottom);
+    $smarty->assign('numpages',$numpages);
+    $smarty->assign('curpage',$page);
+    $smarty->assign('pages',$pages);
+    $smarty->assign('snippets',$snippets);
+    $smarty->display('topsnips.tpl');
+}
 
 $app->get('/snippets/by-lang/:lang(/:page)', function($lang,$page = 1) use ($smarty,$app) {
     //get all snippets for lang
@@ -39,163 +102,59 @@ $app->get('/snippets/by-lang/:lang(/:page)', function($lang,$page = 1) use ($sma
         $app->response->setStatus(404);
         return;
     }
-    if(count($snippets) == 0) {
-        $smarty->assign('message','No snippets available.');
-    }
-    $numpages = (int)(count($snippets) / RESULTS_PER_PAGE);
-    if($numpages != count($snippets) / RESULTS_PER_PAGE) $numpages++;
-    if($numpages < 1) $numpages = 1;
-    if($page > $numpages) {
-        $app->response->headers->set('Location',BASE_HREF.'/');
-        $app->setCookie('message','$page > $numpages'.'<br/>'.$page.'::'.$numpages);
-        $app->response->setStatus(404);
-        return;
-    }
-    $curpage_top = $page * RESULTS_PER_PAGE;
-    $curpage_bottom = $curpage_top - RESULTS_PER_PAGE;
-    unset($snippets);
-    try{
-    if($curpage_bottom < RESULTS_PER_PAGE) {
-        $snippets = Snippet::find('all',array('conditions' => array('language = ?',$lang), 'limit' => RESULTS_PER_PAGE));
-    } else {
-        $snippets = Snippet::find('all',array('conditions' => array('language = ?',$lang), 'limit' => RESULTS_PER_PAGE, 'offset' => $curpage_bottom));
-    }
-    } catch (Exception $e) {
-        $app->response->headers->set('Location',BASE_HREF.'/');
-        $app->setCookie('message','5 '.$e->getMessage());
-        $app->response->setStatus(404);
-        return;
-    }
-    $pages = array();
-    for($n = 1; $n <= $numpages; $n++)
-        $pages[] = $n;
+
     $smarty->assign('url_prefix','snippets/'.$langf->id.'/');
-    $smarty->assign('start_index',$curpage_bottom);
-    $smarty->assign('numpages',$numpages);
-    $smarty->assign('curpage',$page);
-    $smarty->assign('pages',$pages);
     $smarty->assign('title','Snippets for '.ucfirst($langf->name).' (Page '.$page.')');
-    $smarty->assign('snippets',$snippets);
-    $smarty->display('topsnips.tpl');
+    snippetList($snippets,$page,$smarty,$app,function($offset) use ($lang) {
+        if($offset == null) {
+            return Snippet::find('all',array('conditions' => array('language = ?',$lang), 'limit' => RESULTS_PER_PAGE));
+        } else {
+            return Snippet::find('all',array('conditions' => array('language = ?',$lang), 'limit' => RESULTS_PER_PAGE, 'offset' => $offset));
+        }
+    });
 });
 
 
 $app->get('/snippets/by-author/:id(/:page)', function($id, $page = 1) use ($smarty,$app) {
     $snippets = Snippet::find('all',array('conditions' => array('author = ?',$id)));
-    $numpages = (int)(count($snippets) / RESULTS_PER_PAGE);
-    if($numpages != count($snippets) / RESULTS_PER_PAGE) $numpages++;
-    if($numpages < 1) $numpages = 1;
-    if($page > $numpages) {
-        $app->response->headers->set('Location',BASE_HREF.'/');
-        $app->setCookie('message','$page > $numpages'.'<br/>'.$page.'::'.$numpages);
-        $app->response->setStatus(404);
-        return;
-    }
-    $curpage_top = $page * RESULTS_PER_PAGE;
-    $curpage_bottom = $curpage_top - RESULTS_PER_PAGE;
-    unset($snippets);
-    try{
-    if($curpage_bottom < RESULTS_PER_PAGE) {
-        $snippets = Snippet::find('all',array('conditions' => array('author = ?',$id), 'limit' => RESULTS_PER_PAGE));
-    } else {
-        $snippets = Snippet::find('all',array('conditions' => array('author = ?',$id), 'limit' => RESULTS_PER_PAGE, 'offset' => $curpage_bottom));
-    }
-    } catch (Exception $e) {
-        $app->response->headers->set('Location',BASE_HREF.'/');
-        $app->setCookie('message','1 '.$e->getMessage());
-        $app->response->setStatus(404);
-        return;
-    }
-    $pages = array();
-    for($n = 1; $n <= $numpages; $n++)
-        $pages[] = $n;
     $author = Author::find($id);
     $smarty->assign('url_prefix','snippets/by/'.$id.'/');
-    $smarty->assign('start_index',$curpage_bottom);
-    $smarty->assign('numpages',$numpages);
-    $smarty->assign('curpage',$page);
-    $smarty->assign('pages',$pages);
     $smarty->assign('title','Snippets by '.$author->name);
-    $smarty->assign('snippets',$snippets);
-    $smarty->display('topsnips.tpl');
+    snippetList($snippets,$page,$smarty,$app,function($offset) use ($id) {
+        if($offset == null) {
+            return Snippet::find('all',array('conditions' => array('author = ?',$id), 'limit' => RESULTS_PER_PAGE));
+        } else {
+            return Snippet::find('all',array('conditions' => array('author = ?',$id), 'limit' => RESULTS_PER_PAGE, 'offset' => $offset));
+        }
+    });
 });
 
 $app->get('/snippets/top(/:page)', function($page = 1) use ($smarty,$app) {
     $snippets = Snippet::find('all',array('order' => 'rating desc'));
-    $numpages = (int)(count($snippets) / RESULTS_PER_PAGE);
-    if($numpages != count($snippets) / RESULTS_PER_PAGE) $numpages++;
-    if($numpages < 1) $numpages = 1;
-    if($page > $numpages) {
-        $app->response->headers->set('Location',BASE_HREF.'/');
-        $app->setCookie('message','$page > $numpages'.'<br/>'.$page.'::'.$numpages);
-        $app->response->setStatus(404);
-        return;
-    }
-    $curpage_top = $page * RESULTS_PER_PAGE;
-    $curpage_bottom = $curpage_top - RESULTS_PER_PAGE;
-    unset($snippets);
-    try{
-    if($curpage_bottom < RESULTS_PER_PAGE) {
-        $snippets = Snippet::find('all',array('order' => 'rating desc', 'limit' => RESULTS_PER_PAGE));
-    } else {
-        $snippets = Snippet::find('all',array('order' => 'rating desc', 'limit' => RESULTS_PER_PAGE, 'offset' => $curpage_bottom));
-    }
-    } catch (Exception $e) {
-        $app->response->headers->set('Location',BASE_HREF.'/');
-        $app->setCookie('message','2 '.$e->getMessage());
-        $app->response->setStatus(404);
-        return;
-    }
-    $pages = array();
-    for($n = 1; $n <= $numpages; $n++)
-        $pages[] = $n;
+
     $smarty->assign('url_prefix','snippets/top/');
-    $smarty->assign('start_index',$curpage_bottom);
-    $smarty->assign('numpages',$numpages);
-    $smarty->assign('curpage',$page);
-    $smarty->assign('pages',$pages);
     $smarty->assign('title','Top Snippets by Score');
-    $smarty->assign('snippets',$snippets);
-    $smarty->display('topsnips.tpl');
+    snippetList($snippets,$page,$smarty,$app,function($offset) {
+        if($offset == null) {
+            return Snippet::find('all',array('order' => 'rating desc', 'limit' => RESULTS_PER_PAGE));
+        } else {
+            return Snippet::find('all',array('order' => 'rating desc', 'limit' => RESULTS_PER_PAGE, 'offset' => $offset));
+        }
+    });
 });
 
 $app->get('/snippets/recent(/:page)', function($page = 1) use ($app,$smarty) {
     $snippets = Snippet::find('all',array('order' => 'created_at desc'));
-    $numpages = (int)(count($snippets) / RESULTS_PER_PAGE);
-    if($numpages != count($snippets) / RESULTS_PER_PAGE) $numpages++;
-    if($numpages < 1) $numpages = 1;
-    if($page > $numpages) {
-        $app->response->headers->set('Location',BASE_HREF.'/');
-        $app->setCookie('message','$page > $numpages'.'<br/>'.$page.'::'.$numpages);
-        $app->response->setStatus(404);
-        return;
-    }
-    $curpage_top = $page * RESULTS_PER_PAGE;
-    $curpage_bottom = $curpage_top - RESULTS_PER_PAGE;
-    unset($snippets);
-    try{
-    if($curpage_bottom < RESULTS_PER_PAGE) {
-        $snippets = Snippet::find('all',array('order' => 'created_at desc', 'limit' => RESULTS_PER_PAGE));
-    } else {
-        $snippets = Snippet::find('all',array('order' => 'created_at desc', 'limit' => RESULTS_PER_PAGE, 'offset' => $curpage_bottom));
-    }
-    } catch (Exception $e) {
-        $app->response->headers->set('Location',BASE_HREF.'/');
-        $app->setCookie('message','3 '.$e->getMessage());
-        $app->response->setStatus(404);
-        return;
-    }
-    $pages = array();
-    for($n = 1; $n <= $numpages; $n++)
-        $pages[] = $n;
+
     $smarty->assign('url_prefix','snippets/recent/');
-    $smarty->assign('start_index',$curpage_bottom);
-    $smarty->assign('numpages',$numpages);
-    $smarty->assign('curpage',$page);
-    $smarty->assign('pages',$pages);
     $smarty->assign('title','Recent Snippets (Page '.$page.')');
-    $smarty->assign('snippets',$snippets);
-    $smarty->display('topsnips.tpl');
+    snippetList($snippets,$page,$smarty,$app,function($offset) {
+        if($offset == null) {
+            return Snippet::find('all',array('order' => 'created_at desc', 'limit' => RESULTS_PER_PAGE));
+        } else {
+            return Snippet::find('all',array('order' => 'created_at desc', 'limit' => RESULTS_PER_PAGE, 'offset' => $offset));
+        }
+    });
 });
 
 $app->get('/snippets/new', function() use ($app,$smarty,$languages_list) {
@@ -254,25 +213,7 @@ $app->get('/snippet/:id(/:action)', function($id,$action = null) use ($languages
         }
         $smarty->assign('code',$codef);
     }
-    switch($snip->rating) {
-        case 0:
-            $rating = 'Unrated';
-            break;
-        case ($snip->rating < 10):
-            $rating = 'Hated';
-            break;
-        case ($snip->rating < 50):
-            $rating = 'Disliked';
-            break;
-        case ($snip->rating == 50):
-            $rating = 'Divisive';
-            break;
-        case ($snip->rating > 90):
-            $rating = 'Loved';
-            break;
-        default:
-            $rating = 'Liked';
-    }
+    $rating = ratingToString($snip->rating);
     $smarty->assign('rating',$rating);
     $smarty->assign('snip_id',$id);
     $pauth = Author::find($snip->author);
