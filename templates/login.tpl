@@ -6,6 +6,7 @@
     <div class="pure-controls"><input style="width: 8em;" type="submit" class="pure-button pure-button-primary"value="Login" />
     <a href="authors/reset" class="pure-button">Forgot Password?</a></div>
     </div>
+    <input type="hidden" name="redir" value="{$redir}" />
 </form>
 </div>
 {include file="footer.tpl"}

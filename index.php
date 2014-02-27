@@ -443,11 +443,14 @@ $app->get('/captcha', function() use ($app) {
 });
 
 $app->get('/authors/login', function() use ($smarty,$app) {
+    $redir = $app->getCookie('redir');
+    $app->deleteCookie('redir');
     if(check_logged_in($smarty)) {
         $app->response->headers->set('Location',BASE_HREF.'/');
         $app->deleteCookie('user_login');
         return;
     }
+    $smarty->assign('redir',$redir);
     $smarty->assign('title','Snippets Login');
     $smarty->display('login.tpl');
 });
@@ -469,7 +472,7 @@ $app->post('/authors/login', function() use ($app) {
         $app->setCookie('message','The username or password do not match or are otherwise not correct');
         return;
     }
-    $redir = $app->getCookie('redir');
+    $redir = $app->request->post('redir');
     if($redir == '') $redir = '/';
     $app->response->headers->set('Location',BASE_HREF.$redir);
     $app->deleteCookie('redir');
