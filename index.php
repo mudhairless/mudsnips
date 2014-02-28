@@ -1,7 +1,7 @@
 <?php
 require('vendor/autoload.php');
 require('data/config.php');
-require('util.php');
+require('lib/util.php');
 
 $smarty->assign('site_name',SITE_NAME);
 $smarty->assign('site_owner',SITE_OWNER);
