@@ -30,27 +30,72 @@ $app->get('/privacy', function() use ($smarty) {
     $smarty->display('privacy.tpl');
 });
 
-$app->get('/search(/:page)', function($page = 1) use ($smarty,$app) {
-    $req = $app->getCookie('search_query');
-    if($req == '') {
+$app->get('/search(/:page(/:format))', function($page = 1, $format = 'html') use ($smarty,$app) {
+    if($format == 'json') {
+        //output json
         $req = $app->request->get('q');
-        $app->setCookie('search_query',$req);
-    }
-    if($app->request->get('q') != '' && $req != $app->request->get('q')) {
-        $req = $app->request->get('q');
-        $app->setCookie('search_query',$req);
-    }
-    $title = array('title LIKE ?','%'.$req.'%');
-    $snippets = Snippet::find('all',array('conditions' => $title));
-    $smarty->assign('url_prefix','search/');
-    $smarty->assign('title','Search results');
-    snippetList($snippets,$page,$smarty,$app,function($offset) use ($title) {
-        if($offset == null) {
-            return Snippet::find('all',array('limit' => RESULTS_PER_PAGE,'conditions' => $title));
+        if($page == 1) {
+            $snippets = Snippet::find('all',
+                array(
+                    'conditions' => array('title like ?','%'.$req.'%'),
+                    'limit' => RESULTS_PER_PAGE
+                    )
+                );
         } else {
-            return Snippet::find('all',array('limit' => RESULTS_PER_PAGE,'offset' => $offset, 'conditions' => $title));
+            $snippets = Snippet::find('all',
+                array(
+                    'conditions' => array('title like ?','%'.$req.'%'),
+                    'limit' => RESULTS_PER_PAGE,
+                    'offset' => $page
+                    )
+                );
         }
-    });
+        if(count($snippets) == 0) {
+            //nothing to output
+            $app->response->setStatus(404);
+            echo json_encode(array(
+                'error' => 'No results found.',
+                'results' => null,
+                'version' => '1.0'
+                ));
+            return;
+        }
+        $res = array();
+        foreach($snippets as $snip) {
+            $res[] = $snip->to_json(array('only' => array('id','title')));
+        }
+        $jres = array(
+                'query' => $req,
+                'results' => $res,
+                'error' => null,
+                'version' => '1.0',
+                'next-offset' => $page * RESULTS_PER_PAGE
+                );
+        $app->response->setStatus(200);
+        echo json_encode($jres);
+        return;
+    } else {
+        $req = $app->getCookie('search_query');
+        if($req == '') {
+            $req = $app->request->get('q');
+            $app->setCookie('search_query',$req);
+        }
+        if($app->request->get('q') != '' && $req != $app->request->get('q')) {
+            $req = $app->request->get('q');
+            $app->setCookie('search_query',$req);
+        }
+        $title = array('title LIKE ?','%'.$req.'%');
+        $snippets = Snippet::find('all',array('conditions' => $title));
+        $smarty->assign('url_prefix','search/');
+        $smarty->assign('title','Search results');
+        snippetList($snippets,$page,$smarty,$app,function($offset) use ($title) {
+            if($offset == null) {
+                return Snippet::find('all',array('limit' => RESULTS_PER_PAGE,'conditions' => $title));
+            } else {
+                return Snippet::find('all',array('limit' => RESULTS_PER_PAGE,'offset' => $offset, 'conditions' => $title));
+            }
+        });
+    }
 });
 
 $app->get('/captcha', function() use ($app) {
