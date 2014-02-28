@@ -37,41 +37,15 @@ $app->get('/search(/:page)', function($page = 1) use ($smarty,$app) {
     }
     $title = array('title LIKE ?','%'.$req.'%');
     $snippets = Snippet::find('all',array('conditions' => $title));
-    $numpages = (int)(count($snippets) / RESULTS_PER_PAGE);
-    if($numpages != count($snippets) / RESULTS_PER_PAGE) $numpages++;
-    if($numpages < 1) $numpages = 1;
-    if($page > $numpages) {
-        $app->response->headers->set('Location',BASE_HREF.'/');
-        $app->setCookie('message','$page > $numpages'.'<br/>'.$page.'::'.$numpages);
-        $app->response->setStatus(404);
-        return;
-    }
-    $curpage_top = $page * RESULTS_PER_PAGE;
-    $curpage_bottom = $curpage_top - RESULTS_PER_PAGE;
-    unset($snippets);
-    try{
-    if($curpage_bottom < RESULTS_PER_PAGE) {
-        $snippets = Snippet::find('all',array('limit' => RESULTS_PER_PAGE,'conditions' => $title));
-    } else {
-        $snippets = Snippet::find('all',array('limit' => RESULTS_PER_PAGE,'offset' => $curpage_bottom, 'conditions' => $title));
-    }
-    } catch (Exception $e) {
-        $app->response->headers->set('Location',BASE_HREF.'/');
-        $app->setCookie('message','4 '.$e->getMessage());
-        $app->response->setStatus(404);
-        return;
-    }
-    $pages = array();
-    for($n = 1; $n <= $numpages; $n++)
-        $pages[] = $n;
     $smarty->assign('url_prefix','search/');
-    $smarty->assign('start_index',$curpage_bottom);
-    $smarty->assign('numpages',$numpages);
-    $smarty->assign('curpage',$page);
-    $smarty->assign('pages',$pages);
     $smarty->assign('title','Search results');
-    $smarty->assign('snippets',$snippets);
-    $smarty->display('topsnips.tpl');
+    snippetList($snippets,$page,$smarty,$app,function($offset) use ($title) {
+        if($offset == null) {
+            return Snippet::find('all',array('limit' => RESULTS_PER_PAGE,'conditions' => $title));
+        } else {
+            return Snippet::find('all',array('limit' => RESULTS_PER_PAGE,'offset' => $offset, 'conditions' => $title));
+        }
+    });
 });
 
 $app->get('/captcha', function() use ($app) {
