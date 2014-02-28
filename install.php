@@ -1,6 +1,6 @@
 <?php
 require('vendor/autoload.php');
-require('util.php');
+require('lib/util.php');
 
 if(file_exists('data/config.php')) {
     header('Location: index.php');
@@ -9,10 +9,18 @@ if(file_exists('data/config.php')) {
 
 $app = new Slim\Slim();
 $smarty = new Smarty();
+$smarty->setTemplateDir('views/');
+$smarty->setCompileDir('data/smarty/templates_c/');
+$smarty->setConfigDir('data/smarty/configs/');
+$smarty->setCacheDir('data/smarty/cache/');
+$smarty->assign('site_name','MudSnips');
+$smarty->assign('site_contact','sir_mud@users.sf.net');
+$smarty->assign('site_owner','Ebben Feagan');
+$smarty->assign('install',1);
 
 $app->get('/', function() use($smarty) {
 
-    $smarty->assign('title','MudSnip Installation');
+    $smarty->assign('title','Installation');
     $smarty->assign('step',1);
     $smarty->display('install.tpl');
 
@@ -20,7 +28,7 @@ $app->get('/', function() use($smarty) {
 
 $app->post('/',function() use($app) {
     $rdb = $app->request->post('db_connect');
-    $rdmd = $app->request->post('db_models_dir');
+    $rdmd = 'models';
     $rsn = $app->request->post('site_name');
     $rso = $app->request->post('site_owner');
     $rsc = $app->request->post('site_contact');

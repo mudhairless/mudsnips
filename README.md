@@ -6,8 +6,11 @@ MudSnips is a simple way to manage snippets of source code.
 ## Installation
 You'll need Composer to install the dependancies.
 Run `composer install` in the root dir to install everything.
-Create your database using db.sql as a guide.
-Visit install.php in your browser and fill in the blanks.
+Create your database using data/db.sql as a guide.
+Create the dirs data/smarty/cache, data/smarty/templates_c, data/smarty/configs
+Visit the site in your browser and fill in the blanks. (will auto redirect to the installer page)
+You can delete the install.php after installation, but it is coded to
+redirect to the main page if it has already been ran and a config produced.
 Profit!?!
 
 ## Configuration

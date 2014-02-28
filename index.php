@@ -1,7 +1,12 @@
 <?php
 require('vendor/autoload.php');
-require('data/config.php');
+include('data/config.php');
 require('lib/util.php');
+
+if(!isset($smarty)){
+    header('Location: install.php');
+    die();
+}
 
 $smarty->assign('site_name',SITE_NAME);
 $smarty->assign('site_owner',SITE_OWNER);

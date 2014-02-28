@@ -1,6 +1,7 @@
 <a href="#menu" id="menuLink" class="menu-link"><span> </span></a>
 <div id="menu" class="pure-menu pure-menu-open">
     <a class="pure-menu-heading" href="/~mud/snippets/">{$site_name}</a>
+{if !isset($install)}
     <ul>
         <li class=" ">
             <form method="get" class="pure-form" action="search"><input class="pure-input-rounded" style="width: 130px; margin-left: auto; margin-right: auto;" type="search" name="q" value="Search" /></form>
@@ -34,5 +35,5 @@
         </li>
         {/if}
     </ul>
-
+{/if}
 </div>
