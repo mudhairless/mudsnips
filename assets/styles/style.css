@@ -359,3 +359,12 @@ Hides the menu at `48em`, but modify this based on your app's needs.
 .without-top-margin {
     margin-top: 0px;
 }
+
+.content .content-quote {
+    font-family: "Georgia",serif;
+    color: #666;
+    font-style: italic;
+    line-height: 1.8;
+    border-left: 5px solid #DDD;
+    padding-left: 1.5em;
+}
